@@ -1,9 +1,18 @@
-import { createStore } from 'redux';
-import { composeWithDevTools } from 'redux-devtools-extension';
-import rootReducer from './reducers';
+import { combineReducers, applyMiddleware, legacy_createStore as createStore } from 'redux';
+import createSagaMiddleware from 'redux-saga';
+import userReducer from './reducers/index';
+import { watcherSaga } from './sagas';
 
-const store = createStore(
-  rootReducer,
-  composeWithDevTools(),
-);
+const reducer = combineReducers({
+  user: userReducer,
+});
+
+const sagaMiddleware = createSagaMiddleware();
+
+const middleware = [sagaMiddleware];
+
+const store = createStore(reducer, {}, applyMiddleware(...middleware));
+
+sagaMiddleware.run(watcherSaga);
+
 export default store;
